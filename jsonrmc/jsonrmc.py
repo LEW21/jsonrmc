@@ -1,23 +1,12 @@
 import json
 
-class exposed(object):
+def exposed(handler):
 	"""
-	@exposed makes the method accessible remotely. It's a cleaner way of saying: method._exposed = True
+	@exposed makes the method accessible remotely. It's a cleaner way of saying: method.exposed = True
 	"""
 	
-	def __init__(self, method):
-		"""
-		_exposed attribute is appended to the method, so that handle() knows it can be executed.
-		"""
-
-		self._exposed = True
-		self._handler = method
-
-	def __call__(self, *args):
-		if type(self._handler) is type(lambda: None):
-			return self._handler(*args)
-		
-		return self._handler(self, *args)
+	handler.exposed = True
+	return handler
 
 def parse(data):
 	"""
@@ -63,7 +52,7 @@ def handle(root, data):
 	if not hasattr(current, obj["method"]):
 		raise NameError("No such method: " + obj["method"] + "!")
 	
-	if not hasattr(getattr(current, obj["method"]), "_exposed") or not getattr(current, obj["method"])._exposed:
+	if not hasattr(getattr(current, obj["method"]), "_exposed") or not getattr(current, obj["method"]).exposed:
 		raise NameError("Method: " + obj["method"] + " is not exposed!")
 
 
