@@ -14,16 +14,16 @@ class exposed(object):
 		self._handler = method
 
 	def __call__(self, *args):
+		if type(self._handler) is type(lambda: None):
+			return self._handler(*args)
+		
 		return self._handler(self, *args)
 
-def handle(root, data):
+def parse(data):
 	"""
-	handle() processes the JSON-RMC data and tries to execute the appropriate handlers pinned to your root object.
-	Normally handle() will return a ready JSON-RMC response containing the execution result.
-	However two bad things can happen: provided data is not correct JSON or JSON-RMC - in such case ValueError is thrown, or
-	the requested method could not be found - that results in NameError being thrown.
+	parse() processes JSON-RMC data and returns a python dictionary.
 	"""
-
+	
 	# Check if JSON and JSON-RMC are correct
 	obj = json.loads(data)
 	
@@ -34,6 +34,18 @@ def handle(root, data):
 		obj["params"] = []
 	elif not type(obj["params"]) is list:
 		raise ValueError("Incorrect JSON-RMC! params must be a list!")
+	
+	return obj
+
+def handle(root, data):
+	"""
+	handle() processes the JSON-RMC data and tries to execute the appropriate handlers pinned to your root object.
+	Normally handle() will return a ready JSON-RMC response containing the execution result.
+	However two bad things can happen: provided data is not correct JSON or JSON-RMC - in such case ValueError is thrown, or
+	the requested method could not be found - that results in NameError being thrown.
+	"""
+	
+	obj = parse(data)
 	
 	# Split the resource
 	submodules = obj["resource"].strip("/").split("/")

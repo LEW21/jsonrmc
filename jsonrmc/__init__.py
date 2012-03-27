@@ -5,11 +5,12 @@ jsonrmc is a simple Python library implementing the JSON-RMC (remote method call
 # Sample usage:
 #
 # import jsonrmc
-# from jsonrmc import exposed
+# from jsonrmc import exposed, exposed_static
 #
 # class Math:
 #	@exposed
-#	def sum(self, x, y):
+#	@staticmethod
+#	def sum(x, y):
 #		return x + y
 #
 #	@exposed
@@ -39,4 +40,5 @@ jsonrmc is a simple Python library implementing the JSON-RMC (remote method call
 from . import jsonrmc
 
 handle = jsonrmc.handle
+parse = jsonrmc.parse
 exposed = jsonrmc.exposed
