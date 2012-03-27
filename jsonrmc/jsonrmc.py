@@ -52,7 +52,7 @@ def handle(root, data):
 	if not hasattr(current, obj["method"]):
 		raise NameError("No such method: " + obj["method"] + "!")
 	
-	if not hasattr(getattr(current, obj["method"]), "_exposed") or not getattr(current, obj["method"]).exposed:
+	if not hasattr(getattr(current, obj["method"]), "exposed") or not getattr(current, obj["method"]).exposed:
 		raise NameError("Method: " + obj["method"] + " is not exposed!")
 
 
