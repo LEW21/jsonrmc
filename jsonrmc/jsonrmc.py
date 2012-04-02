@@ -2,7 +2,7 @@ import json
 
 def exposed(handler):
 	"""
-	@exposed makes the method accessible remotely. It's a cleaner way of saying: method.exposed = True
+	@exposed makes the method or resource accessible remotely. It's a cleaner way of saying: method.exposed = True
 	"""
 	
 	handler.exposed = True
@@ -30,38 +30,39 @@ def handle(root, data):
 	"""
 	handle() processes the JSON-RMC data and tries to execute the appropriate handlers pinned to your root object.
 	Normally handle() will return a ready JSON-RMC response containing the execution result.
-	However two bad things can happen: provided data is not correct JSON or JSON-RMC - in such case ValueError is thrown, or
-	the requested method could not be found - that results in NameError being thrown.
+	However a bad thing can happen: provided data is not correct JSON or JSON-RMC - in such case ValueError is thrown.
 	"""
 	
 	obj = parse(data)
-	
-	# Split the resource
-	submodules = obj["resource"].strip("/").split("/")
-	
-	# Iterate over the exposed children
-	current = root
-	
-	for sm in [x for x in submodules if x]:
-		if not hasattr(current, sm):
-			raise NameError("Resource not found: " + obj["resource"] + "!")
-		
-		current = getattr(current, sm)
-	
-	# Is the method out there and is it exposed?
-	if not hasattr(current, obj["method"]):
-		raise NameError("No such method: " + obj["method"] + "!")
-	
-	if not hasattr(getattr(current, obj["method"]), "exposed") or not getattr(current, obj["method"]).exposed:
-		raise NameError("Method: " + obj["method"] + " is not exposed!")
 
-
-	# Execute
 	result = error = None
 	
 	try:
-		result = getattr(current, obj["method"])(*obj["params"])
-	except BaseException as e:
+		# Split the resource
+		submodules = obj["resource"].strip("/").split("/")
+	
+		# Iterate over the exposed children
+		current = root
+		
+		for sm in [x for x in submodules if x]:
+			if not hasattr(current, sm) or not hasattr(getattr(current, sm), "exposed") or not getattr(current, sm).exposed:
+				raise NameError("Resource not found: " + obj["resource"] + "!")
+		
+			current = getattr(current, sm)
+		
+		# Is the method out there and is it exposed?
+		if not hasattr(current, obj["method"]):
+			raise NameError("No such method: " + obj["method"] + "!")
+		
+		if not hasattr(getattr(current, obj["method"]), "exposed") or not getattr(current, obj["method"]).exposed:
+			raise NameError("No such method: " + obj["method"] + "!")
+		
+		# Execute
+		try:
+			result = getattr(current, obj["method"])(*obj["params"])
+		except BaseException as e:
+			error = str(e)
+	except NameError as e:
 		error = str(e)
 	
 	# Encode and return
