@@ -58,11 +58,8 @@ def handle(root, data):
 			raise NameError("No such method: " + obj["method"] + "!")
 		
 		# Execute
-		try:
-			result = getattr(current, obj["method"])(*obj["params"])
-		except BaseException as e:
-			error = str(e)
-	except NameError as e:
+		result = getattr(current, obj["method"])(*obj["params"])
+	except BaseException as e:
 		error = str(e)
 	
 	# Encode and return
