@@ -36,7 +36,7 @@ result = jsonrmc.handle(root, jsondata)
 
 from . import jsonrmc
 
-Root = jsonrmc.Root
+Node = jsonrmc.Node
 handle = jsonrmc.handle
 parse = jsonrmc.parse
 exposed = jsonrmc.exposed
