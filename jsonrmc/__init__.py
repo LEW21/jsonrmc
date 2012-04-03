@@ -6,7 +6,6 @@ Sample usage:
 import jsonrmc
 from jsonrmc import exposed
 
-@exposed
 class Math:
 	@exposed
 	@staticmethod

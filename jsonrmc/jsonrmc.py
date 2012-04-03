@@ -12,7 +12,6 @@ class Root(object):
 		return self._resources[key]
 	
 	_resources = {}
-	exposed = True
 
 def exposed(handler):
 	"""
@@ -59,22 +58,22 @@ def handle(root, data):
 		current = root
 		
 		for sm in [x for x in submodules if x]:
-			if not sm in current or not hasattr(current[sm], "exposed") or not current[sm].exposed:
+			try:
+				current = current[sm]
+			except BaseException:
 				raise NameError("Resource not found: " + obj["resource"] + "!")
 		
-			current = current[sm]
-		
-		# Is the method out there and is it exposed?
-		if not hasattr(current, obj["method"]):
-			raise NameError("No such method: " + obj["method"] + "!")
-		
-		if not hasattr(getattr(current, obj["method"]), "exposed") or not getattr(current, obj["method"]).exposed:
+		try:
+			method = getattr(current, obj["method"])
+			if not method.exposed:
+				raise AttributeError
+		except BaseException:
 			raise NameError("No such method: " + obj["method"] + "!")
 		
 		# Execute
-		result = getattr(current, obj["method"])(*obj["params"])
+		result = method(*obj["params"])
 	except BaseException as e:
 		error = str(e)
 	
 	# Encode and return
-	return json.dumps({"id": obj["id"], "result" if result is not None else "error": result if result is not None else error})
+	return json.dumps({"id": obj["id"], "result" if not error else "error": result if not error else error})
