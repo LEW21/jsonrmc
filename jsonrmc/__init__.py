@@ -17,12 +17,8 @@ class Math:
 	def triple(self, x):
 		return 3 * x
 
-@exposed	
-class Root:
-	pass
-
-root = Root()
-root.math = Math()
+root = jsonrmc.Root()
+root["math"] = Math()
 
 
 # Somewhere inside your network handling routines:
@@ -41,6 +37,7 @@ result = jsonrmc.handle(root, jsondata)
 
 from . import jsonrmc
 
+Root = jsonrmc.Root
 handle = jsonrmc.handle
 parse = jsonrmc.parse
 exposed = jsonrmc.exposed

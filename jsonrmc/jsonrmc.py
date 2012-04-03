@@ -1,5 +1,19 @@
 import json
 
+class Root(object):
+	"""
+	The root of a jsonrmc tree. Object passed to the handle() function must be an instance of Root or of a descendant class.
+	"""
+
+	def __setitem__(self, key, value):
+		self._resources[key] = value
+
+	def __getitem__(self, key):
+		return self._resources[key]
+	
+	_resources = {}
+	exposed = True
+
 def exposed(handler):
 	"""
 	@exposed makes the method or resource accessible remotely. It's a cleaner way of saying: method.exposed = True
@@ -45,10 +59,10 @@ def handle(root, data):
 		current = root
 		
 		for sm in [x for x in submodules if x]:
-			if not hasattr(current, sm) or not hasattr(getattr(current, sm), "exposed") or not getattr(current, sm).exposed:
+			if not sm in current or not hasattr(current[sm], "exposed") or not current[sm].exposed:
 				raise NameError("Resource not found: " + obj["resource"] + "!")
 		
-			current = getattr(current, sm)
+			current = current[sm]
 		
 		# Is the method out there and is it exposed?
 		if not hasattr(current, obj["method"]):
