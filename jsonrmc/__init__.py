@@ -6,7 +6,7 @@ Sample usage:
 import jsonrmc
 from jsonrmc import exposed
 
-class Math:
+class Math(jsonrmc.Node):
 	@exposed
 	@staticmethod
 	def sum(x, y):
@@ -16,7 +16,7 @@ class Math:
 	def triple(self, x):
 		return 3 * x
 
-root = jsonrmc.Root()
+root = jsonrmc.Node()
 root["math"] = Math()
 
 

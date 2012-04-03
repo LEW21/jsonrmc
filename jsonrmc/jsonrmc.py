@@ -1,8 +1,8 @@
 import json
 
-class Root(object):
+class Node(object):
 	"""
-	The root of a jsonrmc tree. Object passed to the handle() function must be an instance of Root or of a descendant class.
+	A node of a jsonrmc tree. Object passed to the handle() function must be an instance of Node or of a descendant class.
 	"""
 
 	def __setitem__(self, key, value):
