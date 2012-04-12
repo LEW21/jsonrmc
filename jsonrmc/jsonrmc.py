@@ -39,6 +39,9 @@ def parse(data):
 	
 	return obj
 
+# Methods executed before and after calling. They take parsed JSON-RMC dictionary as a parameter.
+beforeCall = afterCall = lambda parsedObj: None
+
 def handle(root, data):
 	"""
 	handle() processes the JSON-RMC data and tries to execute the appropriate handlers pinned to your root object.
@@ -71,7 +74,9 @@ def handle(root, data):
 			raise NameError("No such method: " + obj["method"] + "!")
 		
 		# Execute
+		beforeCall(obj)
 		result = method(*obj["params"])
+		afterCall(obj)
 	except BaseException as e:
 		error = str(e)
 	

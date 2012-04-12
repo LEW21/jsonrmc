@@ -40,3 +40,6 @@ Node = jsonrmc.Node
 handle = jsonrmc.handle
 parse = jsonrmc.parse
 exposed = jsonrmc.exposed
+beforeCall = jsonrmc.beforeCall
+afterCall = jsonrmc.afterCall
+
