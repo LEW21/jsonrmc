@@ -34,12 +34,4 @@ result = jsonrmc.handle(root, jsondata)
 
 """
 
-from . import jsonrmc
-
-Node = jsonrmc.Node
-handle = jsonrmc.handle
-parse = jsonrmc.parse
-exposed = jsonrmc.exposed
-beforeCall = jsonrmc.beforeCall
-afterCall = jsonrmc.afterCall
-
+from .jsonrmc import handle, exposed

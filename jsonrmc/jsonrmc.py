@@ -1,18 +1,5 @@
 import json
 
-class Node(object):
-	"""
-	A node of a jsonrmc tree. Object passed to the handle() function must be an instance of Node or of a descendant class.
-	"""
-
-	def __setitem__(self, key, value):
-		self._resources[key] = value
-
-	def __getitem__(self, key):
-		return self._resources[key]
-	
-	_resources = {}
-
 def exposed(handler):
 	"""
 	@exposed makes the method or resource accessible remotely. It's a cleaner way of saying: method.exposed = True
@@ -38,9 +25,6 @@ def parse(data):
 		raise ValueError("Incorrect JSON-RMC! params must be a list!")
 	
 	return obj
-
-# Methods executed before and after calling. They take parsed JSON-RMC dictionary as a parameter.
-beforeCall = afterCall = lambda parsedObj: None
 
 def handle(root, data):
 	"""
@@ -79,9 +63,7 @@ def handle(root, data):
 			raise NameError("No such method: " + obj["method"] + "!")
 		
 		# Execute
-		beforeCall(obj)
 		response["result"] = method(*obj["params"])
-		afterCall(obj)
 	except BaseException as e:
 		response["error"] = str(e)
 	
