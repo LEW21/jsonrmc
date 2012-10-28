@@ -31,12 +31,16 @@ def call(root, resource, method, params, **kwargs):
 	# Execute
 	return func(*params)
 
-def handle(root, data):
+def handle(app, data):
 	"""
 	handle() processes the JSON-RMC data and tries to execute the appropriate handlers pinned to your root object.
 	Normally handle() will return a ready JSON-RMC response containing the execution result.
 	However a bad thing can happen: provided data is not correct JSON - in such case ValueError is thrown.
 	"""
+
+	if not callable(app):
+		app = lambda **kwargs: call(app, **kwargs)
+
 	obj = json.loads(data)
 
 	response = {}
@@ -56,7 +60,7 @@ def handle(root, data):
 		elif not type(obj["params"]) is list:
 			raise ValueError("Incorrect JSON-RMC! params must be a list!")
 
-		response["result"] = call(root, **obj)
+		response["result"] = app(**obj)
 	except BaseException as e:
 		response["error"] = str(e)
 	
