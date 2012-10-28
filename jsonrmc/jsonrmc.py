@@ -8,24 +8,6 @@ def exposed(handler):
 	handler.exposed = True
 	return handler
 
-def parse(data):
-	"""
-	parse() processes JSON-RMC data and returns a python dictionary.
-	"""
-	
-	# Check if JSON and JSON-RMC are correct
-	obj = json.loads(data)
-	
-	if not "resource" in obj or not "method" in obj:
-		raise ValueError("Incorrect JSON-RMC! resource and method are required!")
-	
-	if not "params" in obj:
-		obj["params"] = []
-	elif not type(obj["params"]) is list:
-		raise ValueError("Incorrect JSON-RMC! params must be a list!")
-	
-	return obj
-
 def call(root, resource, method, params, **kwargs):
 	# Split the resource
 	submodules = resource.strip("/").split("/")
@@ -53,10 +35,9 @@ def handle(root, data):
 	"""
 	handle() processes the JSON-RMC data and tries to execute the appropriate handlers pinned to your root object.
 	Normally handle() will return a ready JSON-RMC response containing the execution result.
-	However a bad thing can happen: provided data is not correct JSON or JSON-RMC - in such case ValueError is thrown.
+	However a bad thing can happen: provided data is not correct JSON - in such case ValueError is thrown.
 	"""
-	
-	obj = parse(data)
+	obj = json.loads(data)
 
 	response = {}
 
@@ -66,6 +47,15 @@ def handle(root, data):
 		pass
 
 	try:
+		# Check if JSON and JSON-RMC are correct
+		if not "resource" in obj or not "method" in obj:
+			raise ValueError("Incorrect JSON-RMC! resource and method are required!")
+
+		if not "params" in obj:
+			obj["params"] = []
+		elif not type(obj["params"]) is list:
+			raise ValueError("Incorrect JSON-RMC! params must be a list!")
+
 		response["result"] = call(root, **obj)
 	except BaseException as e:
 		response["error"] = str(e)
