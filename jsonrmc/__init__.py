@@ -1,36 +1,35 @@
-"""
-jsonrmc is a simple Python library implementing the JSON-RMC (remote method call) interface. Design rationale is strongly influenced by CherryPy.
+"""Simple Python library implementing the JSON-RMC (remote method call) interface.
 
-Sample usage:
+Server-side design rationale is strongly influenced by CherryPy.
 
-import jsonrmc
-from jsonrmc import exposed
+Sample server-side usage::
 
-class Math(jsonrmc.Node):
-	@exposed
-	@staticmethod
-	def sum(x, y):
-		return x + y
+	from jsonrmc import exposed
 
-	@exposed
-	def triple(self, x):
-		return 3 * x
+	class Math:
+		@exposed
+		@staticmethod
+		def sum(x, y):
+			return x + y
 
-root = jsonrmc.Node()
-root["math"] = Math()
+		@exposed
+		def triple(self, x):
+			return 3 * x
 
+	root = {}
+	root["math"] = Math()
 
-# Somewhere inside your network handling routines:
+	# Somewhere inside your network handling routines:
+	from jsonrmc import handle
+	# ...
+	result = handle(root, jsondata)
+	# ...
 
-# ...
-result = jsonrmc.handle(root, jsondata)
-# ...
+	# Now let's assume a client sent a request:
+	# {"id": 1, "resource": "/math", "method": "triple", "params": [10]}
 
-# Now let's assume a client sent a request:
-# {"id": 1, "resource": "/math", "method": "triple", "params": [10]}
-
-# When jsonrmc.handle is called for root, response is ready:
-# {"id": 1, "result": 30}
+	# When jsonrmc.handle is called for root, response is ready:
+	# {"id": 1, "result": 30}
 
 """
 
