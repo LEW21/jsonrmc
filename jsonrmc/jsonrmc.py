@@ -26,6 +26,29 @@ def parse(data):
 	
 	return obj
 
+def call(root, resource, method, params, **kwargs):
+	# Split the resource
+	submodules = resource.strip("/").split("/")
+
+	# Iterate over the exposed children
+	current = root
+
+	for sm in [x for x in submodules if x]:
+		try:
+			current = current[sm]
+		except BaseException:
+			raise NameError("Resource not found: " + resource + "!")
+
+	try:
+		func = getattr(current, method)
+		if not method.exposed:
+			raise AttributeError
+	except BaseException:
+		raise NameError("No such method: " + method + "!")
+
+	# Execute
+	return func(*params)
+
 def handle(root, data):
 	"""
 	handle() processes the JSON-RMC data and tries to execute the appropriate handlers pinned to your root object.
@@ -41,29 +64,9 @@ def handle(root, data):
 		response["id"] = obj["id"]
 	except:
 		pass
-	
+
 	try:
-		# Split the resource
-		submodules = obj["resource"].strip("/").split("/")
-	
-		# Iterate over the exposed children
-		current = root
-		
-		for sm in [x for x in submodules if x]:
-			try:
-				current = current[sm]
-			except BaseException:
-				raise NameError("Resource not found: " + obj["resource"] + "!")
-		
-		try:
-			method = getattr(current, obj["method"])
-			if not method.exposed:
-				raise AttributeError
-		except BaseException:
-			raise NameError("No such method: " + obj["method"] + "!")
-		
-		# Execute
-		response["result"] = method(*obj["params"])
+		response["result"] = call(root, **obj)
 	except BaseException as e:
 		response["error"] = str(e)
 	
