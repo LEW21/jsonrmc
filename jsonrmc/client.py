@@ -1,3 +1,18 @@
+"""JSON-RMC client library.
+
+Usage::
+
+	from socket import socket
+	from jsonrmc.client import Connection
+
+	with socket() as s:
+		s.connect(("localhost", 6000))
+		with s.makefile('rw') as stream:
+			rmc = Connection(stream)
+			rmc.call("/my/object", "method", ["param1", 2])
+
+"""
+
 from reserve.jsons import Stream
 
 class Connection:
