@@ -29,8 +29,8 @@ def parse(data):
 	# Check if JSON and JSON-RMC are correct
 	obj = json.loads(data)
 	
-	if not "id" in obj or not "resource" in obj or not "method" in obj:
-		raise ValueError("Incorrect JSON-RMC! id, resource and method are required!")
+	if not "resource" in obj or not "method" in obj:
+		raise ValueError("Incorrect JSON-RMC! resource and method are required!")
 	
 	if not "params" in obj:
 		obj["params"] = []
@@ -51,7 +51,12 @@ def handle(root, data):
 	
 	obj = parse(data)
 
-	result = error = None
+	response = {}
+
+	try:
+		response["id"] = obj["id"]
+	except:
+		pass
 	
 	try:
 		# Split the resource
@@ -75,10 +80,10 @@ def handle(root, data):
 		
 		# Execute
 		beforeCall(obj)
-		result = method(*obj["params"])
+		response["result"] = method(*obj["params"])
 		afterCall(obj)
 	except BaseException as e:
-		error = str(e)
+		response["error"] = str(e)
 	
 	# Encode and return
-	return json.dumps({"id": obj["id"], "result" if not error else "error": result if not error else error})
+	return json.dumps(response)
