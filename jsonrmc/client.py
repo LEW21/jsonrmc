@@ -4,9 +4,10 @@ class Connection:
 	def __init__(socket):
 		self.stream = Stream(socket)
 
-	def call(**kwargs):
+	def call(resource, method, params):
+		message = {"resource": resource, "method": method, "params": params}
 		try:
-			self.stream.write(kwargs)
+			self.stream.write(message)
 			response = self.stream.read()
 		except:
 			raise IOError("Connection error.")
