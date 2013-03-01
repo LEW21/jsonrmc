@@ -128,5 +128,5 @@ import json
 
 def handle(app, data):
 	obj = json.loads(data)
-	result = Handler(app)(data)
+	result = Handler(app)(obj)
 	return json.dumps(result)
